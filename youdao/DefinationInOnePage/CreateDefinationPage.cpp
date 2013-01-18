@@ -84,7 +84,7 @@ string createPage(const map<string, string> & wordList)
 			"	<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n"
 			"	<title>WORDS</title>\n"
 			"	<style>\n")
-			+ result_min_css + 
+			+ result_min_css +
 			"		body {\n"
 			"			width: 960px;\n"
 			"		}\n"
@@ -139,7 +139,9 @@ int main (int argc, char const* argv[]) {
 		string htmlStr = readHtmlFile(word + ".html");
 		string divStr  = cutDiv(htmlStr);
 
-		wordList[word] = divStr;
+		if (!divStr.empty()) {
+			wordList[word] = divStr;
+		}
 	}
 
 	string pageStr(createPage(wordList));
