@@ -89,10 +89,9 @@ string createPage(const map<string, string> & wordList)
 			"			width: 960px;\n"
 			"		}\n"
 			"		#sidebar {\n"
-			"			width: 20em;\n"
 			"			height: 100%;\n"
-			"			padding-top: 2em;\n"
-			"			padding-left: 2em;\n"
+			"			padding: 2em;\n"
+			"			padding-left: 6em;\n"
 			"			border-right: 2px solid #999;\n"
 			"			position: fixed;\n"
 			"		}\n"
@@ -116,9 +115,8 @@ string createPage(const map<string, string> & wordList)
 	string mainStr;
 
 	for(auto it = wordList.begin(); it != wordList.end(); ++it) {
-		sidebarStr += "<h3><a href=\"#collinsResult-" + it->first + "\">" + it->first + "</a></h3>\n";
-		string defineStr =  it->second;
-		mainStr += defineStr.replace(defineStr.find("collinsResult"), 13, "collinsResult-" + it->first) + "\n";
+		sidebarStr += "<h3><a href=\"#word-" + it->first + "\">" + it->first + "</a></h3>\n";
+		mainStr += "<div id=\"word-" + it->first + "\"\n>" + it->second + "</div>\n";
 	}
 
 	htmlStr.replace(htmlStr.find("[###SIDEBAR###]"), 15, sidebarStr);
