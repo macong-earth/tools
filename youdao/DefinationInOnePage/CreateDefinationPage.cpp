@@ -10,6 +10,8 @@
 
 using namespace std;
 
+extern string result_min_css;
+
 enum DivType {
 	DIV_OPEN,
 	DIV_CLOSE
@@ -76,13 +78,13 @@ string readHtmlFile(const string & filename)
 
 string createPage(const map<string, string> & wordList)
 {
-	string htmlStr("<!DOCTYPE html>\n"
+	string htmlStr(string("<!DOCTYPE html>\n"
 			"<html>\n"
 			"<head>\n"
 			"	<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n"
 			"	<title>WORDS</title>\n"
-			"	<link href=\"http://shared.ydstatic.com/dict/v5.11/styles/result-min.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
-			"	<style>\n"
+			"	<style>\n")
+			+ result_min_css + 
 			"		body {\n"
 			"			width: 960px;\n"
 			"		}\n"
@@ -144,3 +146,4 @@ int main (int argc, char const* argv[]) {
 	cout << pageStr << endl;
 	return EXIT_SUCCESS;
 }
+
