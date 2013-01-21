@@ -11,4 +11,4 @@ done
 
 cd cache
 
-../GeneratePage.exe $words > ../defination.html
+../GeneratePage.exe $words > ../definition.html

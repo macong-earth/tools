@@ -1,3 +1,7 @@
+/**
+ *  @brief Generate definition page of the specified word
+ */
+
 #include <cstring>
 #include <string>
 #include <iostream>
