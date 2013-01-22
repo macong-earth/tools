@@ -1,7 +1,8 @@
 /**
- *  @brief Generate definition page of the specified word
+ * \file generate definition page of specified words
+ * \author Cong Ma
+ * \date 2013-01-21
  */
-
 #include <cstring>
 #include <string>
 #include <iostream>
@@ -14,13 +15,30 @@
 
 using namespace std;
 
+/**
+ *  \brief infile css of GeneratePage.html
+ */
 extern string result_min_css;
 
+/**
+ * \brief type of div tag
+ */
 enum DivType {
-	DIV_OPEN,
-	DIV_CLOSE
+	DIV_OPEN, /**< open div tag */
+	DIV_CLOSE ///< close div tag
 };
 
+/** \brief find next div open or close tag in a html string
+ *
+ * @param htmlStr string to examine
+ * @param pos position at which to begin searching
+ * @return tuple<bool exist, size_t pos, DivType type>
+ *    - exsit:
+ *        + true if a div tag is found
+ *        + false if no div tag is found
+ *    - pos: position at which the tag starts
+ *    - type: open or close div tag
+ */
 tuple<bool, size_t, DivType> getNextDivTag(const string & htmlStr, size_t pos)
 {
 	if (htmlStr.size() > pos) {
@@ -38,6 +56,10 @@ tuple<bool, size_t, DivType> getNextDivTag(const string & htmlStr, size_t pos)
 	return make_tuple(false, 0, DIV_OPEN);
 }
 
+/** \brief cut div whose id is collinsResult from the html page
+ * @param htmlStr html string at which to examine
+ * @return null if there is no div with collinsResult as id
+ */
 string cutDiv(const string & htmlStr)
 {
 	string divStr;
@@ -67,6 +89,9 @@ string cutDiv(const string & htmlStr)
 	return divStr;
 }
 
+/**
+ * \brief read content of a file to a string
+ */
 string readHtmlFile(const string & filename)
 {
 	string htmlStr;
@@ -99,6 +124,9 @@ string createPage(const map<string, string> & wordList)
 			"			border-right: 2px solid #999;\n"
 			"			position: fixed;\n"
 			"		}\n"
+			"		#sidebar img{\n"
+			"			padding-left: 5px;\n"
+			"		}\n"
 			"		#main {\n"
 			"			margin-left: 23em;\n"
 			"		}\n"
@@ -111,15 +139,23 @@ string createPage(const map<string, string> & wordList)
 			"<div id=\"main\">\n"
 			"[###MAIN###]"
 			"</div>\n"
+			"<script>\n"
+			"	var speaker = new Audio();\n"
+			"	function pronounce(word) {\n"
+			"		speaker.src = \"https://www.gstatic.com/dictionary/static/sounds/de/0/\" + word + \".mp3\";\n"
+			"		speaker.play();\n"
+			"}\n"
+			"</script>\n"
 			"</body>\n"
 			"</html>\n"
 			);
 
+	string word;
 	string sidebarStr;
 	string mainStr;
 
 	for(auto it = wordList.begin(); it != wordList.end(); ++it) {
-		sidebarStr += "<h3><a href=\"#word-" + it->first + "\">" + it->first + "</a></h3>\n";
+		sidebarStr += "<h3><a href=\"#word-" + it->first + "\">" + it->first + "</a><img src=\"speaker-icon.png\" onclick=\"pronounce('" + it->first + "')\" /></h3>\n";
 		mainStr += "<div id=\"word-" + it->first + "\"\n>" + it->second + "</div>\n";
 	}
 
