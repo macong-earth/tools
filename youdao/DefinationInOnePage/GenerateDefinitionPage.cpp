@@ -114,22 +114,6 @@ string createPage(const map<string, string> & wordList)
 			"	<title>WORDS</title>\n"
 			"	<style>\n")
 			+ result_min_css +
-			"		body {\n"
-			"			width: 960px;\n"
-			"		}\n"
-			"		#sidebar {\n"
-			"			height: 100%;\n"
-			"			padding: 2em;\n"
-			"			padding-left: 6em;\n"
-			"			border-right: 2px solid #999;\n"
-			"			position: fixed;\n"
-			"		}\n"
-			"		#sidebar img{\n"
-			"			padding-left: 5px;\n"
-			"		}\n"
-			"		#main {\n"
-			"			margin-left: 23em;\n"
-			"		}\n"
 			"	</style>\n"
 			"</head>\n"
 			"<body>\n"
@@ -155,7 +139,7 @@ string createPage(const map<string, string> & wordList)
 	string mainStr;
 
 	for(auto it = wordList.begin(); it != wordList.end(); ++it) {
-		sidebarStr += "<h3><a href=\"#word-" + it->first + "\">" + it->first + "</a><img src=\"speaker-icon.png\" onclick=\"pronounce('" + it->first + "')\" /></h3>\n";
+		sidebarStr += "<h3><a href=\"#word-" + it->first + "\" onclick=\"pronounce('" + it->first + "')\">" + it->first + "</a></h3>\n";
 		mainStr += "<div id=\"word-" + it->first + "\"\n>" + it->second + "</div>\n";
 	}
 
