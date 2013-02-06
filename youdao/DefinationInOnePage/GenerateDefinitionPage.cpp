@@ -107,10 +107,11 @@ string readHtmlFile(const string & filename)
 
 string createPage(const map<string, string> & wordList)
 {
-	string htmlStr(string("<!DOCTYPE html>\n"
+	string htmlStr(string("\xEF\xBB\xBF<!DOCTYPE html>\n"
 			"<html>\n"
 			"<head>\n"
 			"	<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n"
+			"	<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n "
 			"	<title>WORDS</title>\n"
 			"	<style>\n")
 			+ result_min_css +
