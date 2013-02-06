@@ -1,7 +1,7 @@
 #include <string>
 
 std::string result_min_css(
-"		body{padding:0;margin:0;font-size:14px;font-family:Arial,sans-serif;color:#434343;line-height:24px}\n"
+"  	body{padding:0;margin:0;font-size:14px;font-family:Arial,sans-serif;color:#434343;line-height:24px}\n"
 "		h1,h2,h3,h4,h5,p,ul,form,li,ol,div,dl,dt,dd{margin:0;padding:0}\n"
 "		ul,ol,li{list-style:none}\n"
 "		a:link,a:visited{color:#35a1d4;outline:0}\n"
