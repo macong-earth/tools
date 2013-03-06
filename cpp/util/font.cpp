@@ -14,6 +14,8 @@
 
 #ifndef FONT5X7_H
 #define FONT5X7_H
+#include <cstring>
+#include <iostream>
 
 // standard ascii 5x7 font
 // defines ascii characters 0x20-0x7F (32-127)
@@ -116,44 +118,76 @@ static unsigned char Font5x7[] = {
 	0x08, 0x1C, 0x2A, 0x08, 0x08 // <-
 };
 
-#endif
 
-#include <iostream>
-using namespace std;
+class DrawString
+{
+	public:
+		DrawString(const std::string & str, int radio, unsigned char bitValue = 0xEE)
+			: m_str(str),
+			m_radio(radio),
+			m_lineWidth(str.size() * (COLUMN_NUM + COLUMN_PADDING) * m_radio),
+			m_lineOffset(0),
+			m_bitValue(bitValue) {}
 
-const int ROW_NUM    = 8;
-const int COLUMN_NUM = 5;
+		void drawLine(unsigned char * output)
+		{
+			m_output     = output;
+			m_lineOffset = 0;
 
-int main (int argc, char const* argv[]) {
-	unsigned char fonts[][COLUMN_NUM] = {
-		0x3E, 0x51, 0x49, 0x45, 0x3E,// 0
-		0x00, 0x42, 0x7F, 0x40, 0x00,// 1
-		0x42, 0x61, 0x51, 0x49, 0x46,// 2
-		0x21, 0x41, 0x45, 0x4B, 0x31,// 3
-		0x18, 0x14, 0x12, 0x7F, 0x10,// 4
-		0x27, 0x45, 0x45, 0x45, 0x39,// 5
-		0x3C, 0x4A, 0x49, 0x49, 0x30,// 6
-		0x01, 0x71, 0x09, 0x05, 0x03,// 7
-		0x36, 0x49, 0x49, 0x49, 0x36,// 8
-		0x06, 0x49, 0x49, 0x29, 0x1E,// 9
-		0x00, 0x36, 0x36, 0x00, 0x00,// :
-	};
+			for (int n = 0; n < m_str.size(); n++) {
+				drawLetter(m_str[n], m_output);
+				m_lineOffset += (COLUMN_NUM + COLUMN_PADDING) * m_radio;
+			}
 
-	bool output[ROW_NUM * 2][COLUMN_NUM * 2] = {false};
+		}
 
-	for (int n = 0; n < sizeof(fonts)/COLUMN_NUM; n++) {
-		for(int j= 0; j < ROW_NUM * 2; j++) {
-			for(int i = 0; i < COLUMN_NUM * 2; i++) {
-				if (fonts[n][i/2] >> (j/2) & 0x01) {
-					cout << "\xDB";
-				}
-				else {
-					cout << " ";
+		static const int ROW_NUM        = 8;
+		static const int COLUMN_NUM     = 5;
+		static const int COLUMN_PADDING = 1;
+
+	private:
+		void drawLetter(char ch, unsigned char * m_output)
+		{
+			for(int i= 0; i < ROW_NUM * m_radio; i++) {
+				for(int j = 0; j < COLUMN_NUM * m_radio; j++) {
+					if (Font5x7[(ch - ' ') * COLUMN_NUM + j/m_radio] >> (i/m_radio) & 0x01) {
+						m_output[i*m_lineWidth + j + m_lineOffset] = m_bitValue;
+					}
+					else {
+						m_output[i*m_lineWidth + j + m_lineOffset] = 0x00;
+					}
 				}
 			}
-			cout << "\n";
 		}
-		cout << "\n";
+
+	private:
+		std::string m_str;
+		int m_radio;
+		unsigned char * m_output;
+		int m_lineWidth;
+		int m_lineOffset;
+		unsigned char  m_bitValue;
+};
+
+int main (int argc, char const* argv[]) {
+
+	std::string str      = "Hello world!";
+	const int radio = 1;
+	unsigned char output[DrawString::ROW_NUM * radio][(DrawString::COLUMN_NUM + DrawString::COLUMN_PADDING) * radio * str.size()];
+
+	memset(&output, 0, sizeof(output));
+
+	DrawString draw(str, radio, '@');
+	draw.drawLine(&output[0][0]);
+
+	for (int i = 0; i < DrawString::ROW_NUM * radio; i++) {
+		for (int j = 0; j < (DrawString::COLUMN_NUM + DrawString::COLUMN_PADDING) * str.size() * radio; j++) {
+			std::cout << output[i][j];
+		}
+		std::cout << "\n";
 	}
+	std::cout << "\n";
+
 	return 0;
 }
+#endif
