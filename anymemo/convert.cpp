@@ -1,8 +1,35 @@
-#include <iostream>
-#include <fstream>
 #include <cstring>
 #include <string>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
 
+class Tag
+{
+	public:
+		Tag(const std::string & tagStr) : m_tagStr(trim(tagStr)) {}
+		std::string string() {return m_tagStr;}
+
+	private:
+		std::string trim(const std::string & tagStr);
+	private:
+		std::string m_tagStr;
+
+};
+
+std::string Tag::trim(const std::string & tagStr)
+{
+	char lastCh = '\0';
+	std::string str(tagStr);
+
+	str.erase(std::remove_if(str.begin(), str.end(), [&lastCh](char ch){
+				bool result = ::isspace(ch) && ::isspace(lastCh);
+				lastCh = ch;
+				return result;
+				}), str.end());
+	return str;
+}
 
 class FileBuffer
 {
@@ -112,7 +139,7 @@ std::string FileBuffer::nextElement()
 {
 	std::string tag(findTag());
 	while(!tag.empty()) {
-		std::cout << tag << std::endl;
+		std::cout << Tag(tag).string() << std::endl;
 		tag = findTag();
 	}
 
