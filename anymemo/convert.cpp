@@ -6,7 +6,74 @@
 #include <algorithm>
 #include "convert.h"
 
+namespace {
+	std::string trim(const std::string & tagStr)
+	{
+		char lastCh = '\0';
+		std::string str(tagStr);
 
+		str.erase(std::remove_if(str.begin(), str.end(), [&lastCh](char ch){
+					bool result = ::isspace(ch) && ::isspace(lastCh);
+					lastCh = ch;
+					return result;
+					}), str.end());
+		if (isspace(str.back())) {
+			str.pop_back();
+		}
+		return str;
+	}
+}
+
+
+void Element::setAttrs()
+{
+	size_t pos = 1;
+	size_t len = m_content.length() - 1;
+	size_t tagHead = 0;
+	size_t tagEnd = 0;
+	size_t nameHead = 0;
+	size_t nameEnd = 0;
+	size_t valueHead = 0;
+	size_t valueEnd = 0;
+
+	while((::isspace(m_content[pos]) || '/' == m_content[pos])&& pos < len)  pos++;  // skip spaces
+	tagHead = pos;
+
+	while(!::isspace(m_content[pos]) && pos < len)  pos++;  // skip tagname
+	tagEnd = pos;
+
+	m_tagName = m_content.substr(tagHead, tagEnd - tagHead);
+
+	while(pos < len) {
+		while(::isspace(m_content[pos]) && pos < len) pos++;  // skip spaces
+		nameHead = pos;
+
+		while('=' != m_content[pos] && pos < len) pos++;
+		nameEnd = pos;
+
+		while('"' != m_content[pos] && pos < len) pos++;
+		valueHead = ++pos;
+
+		while('"' != m_content[pos] && pos < len) pos++;
+		valueEnd = pos;
+
+		if (nameHead < len && nameEnd < len && valueHead < len && valueEnd < len) {
+			m_attrs[trim(m_content.substr(nameHead, nameEnd - nameHead))]
+				= trim(m_content.substr(valueHead, valueEnd - valueHead));
+		}
+
+		pos++;
+	}
+
+}
+
+void Element::showAttrs() const
+{
+	std::cout << m_tagName << std::endl;
+	for(auto attr : m_attrs) {
+		std::cout << attr.first << ":" << attr.second << std::endl;
+	}
+}
 
 FileBuffer::FileBuffer(std::ifstream & file) : m_bufLen(0),
 	m_curInBuf(m_buf),
@@ -21,22 +88,6 @@ FileBuffer::~FileBuffer()
 	if(m_file) {
 		m_file.close();
 	}
-}
-
-std::string FileBuffer::trim(const std::string & tagStr)
-{
-	char lastCh = '\0';
-	std::string str(tagStr);
-
-	str.erase(std::remove_if(str.begin(), str.end(), [&lastCh](char ch){
-				bool result = ::isspace(ch) && ::isspace(lastCh);
-				lastCh = ch;
-				return result;
-				}), str.end());
-	if (isspace(str.back())) {
-		str.pop_back();
-	}
-	return str;
 }
 
 char* FileBuffer::findTagHead()
@@ -148,7 +199,7 @@ Element FileBuffer::nextElement()
 
 	if (m_isLastElementTag) {
 		element =  trim(getText());
-		if (!element.empty()) {
+		if (!element.empty() || eof()) {
 			m_isLastElementTag = false;
 			return Element(element, Element::TEXT);
 		}
@@ -156,8 +207,6 @@ Element FileBuffer::nextElement()
 	element =  trim(getTag());
 	m_isLastElementTag = true;
 	return Element(element, Element::TAG);
-
-	//return Element(trim(getTag()), Element::TAG);
 }
 
 bool FileBuffer::eof()
@@ -172,6 +221,7 @@ int main (int argc, char const* argv[]) {
 		Element element(fileBuffer.nextElement());
 		if (element.type() == Element::TAG) {
 			std::cout << element.string() << std::endl;
+			element.showAttrs();
 		}
 	}
 	return 0;
