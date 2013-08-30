@@ -17,13 +17,21 @@ namespace {
 					lastCh = ch;
 					return result;
 					}), str.end());
+
+		std::replace_if(str.begin(), str.end(), [&lastCh](char ch){
+				return ::isspace(ch);
+				}, ' ');
+
 		if (isspace(str.back())) {
 			str.pop_back();
 		}
 		return str;
 	}
+
 }
 
+
+const std::set<std::string> Element::m_filter = {"meta"};
 
 void Element::setAttrs()
 {
@@ -36,7 +44,8 @@ void Element::setAttrs()
 	size_t valueHead = 0;
 	size_t valueEnd = 0;
 
-	while((::isspace(m_content[pos]) || '/' == m_content[pos])&& pos < len)  pos++;  // skip spaces
+	while(::isspace(m_content[pos]) && pos < len)  pos++;  // skip spaces
+	m_tagType = ('/' == m_content[pos]) ? (pos++, CLOSING_TAG) : OPENING_TAG;
 	tagHead = pos;
 
 	while(!::isspace(m_content[pos]) && pos < len)  pos++;  // skip tagname
@@ -67,12 +76,23 @@ void Element::setAttrs()
 
 }
 
+std::string Element::attr(const std::string & attr) const
+{
+	auto it = m_attrs.find(attr);
+	return it == m_attrs.end() ? "": it->second;
+}
+
 void Element::showAttrs() const
 {
 	std::cout << m_tagName << std::endl;
 	for(auto attr : m_attrs) {
 		std::cout << attr.first << ":" << attr.second << std::endl;
 	}
+}
+
+bool Element::isInFilter(const Element & tag)
+{
+	return m_filter.find(tag.tagName()) != m_filter.end();
 }
 
 FileBuffer::FileBuffer(std::ifstream & file) : m_bufLen(0),
@@ -182,13 +202,13 @@ bool FileBuffer::readMore()
 		} else {
 			m_bufLen = m_file.gcount();
 			m_buf[m_bufLen] = 0;
-			std::cout << "read failed. " << m_bufLen << std::endl;
+			//std::cout << "read failed. " << m_bufLen << std::endl;
 		}
 		m_curInBuf = m_buf;
 		return true;
 	}
 	m_curInBuf = m_buf + m_bufLen;
-	std::cout << "at the end of file or something wrong" << std::endl;
+	//std::cout << "at the end of file or something wrong" << std::endl;
 	return false;
 }
 
@@ -214,16 +234,97 @@ bool FileBuffer::eof()
 	return !m_file && (m_curInBuf == (m_buf + m_bufLen));
 }
 
+void TagStack::pushProcess(Element tag)
+{
+	if (tag.attr("id") == "collinsResult") {
+		if (m_wordTag) {
+			std::cout << "line: " << __LINE__ << std::endl;
+			throw std::exception();
+		}
+		m_wordTag = true;
+	} else if (tag.tagName() == "h4" && m_wordTag) {
+		if (m_h4Tag) {
+			std::cout << "line: " << __LINE__ << std::endl;
+			throw std::exception();
+		}
+		m_h4Tag = true;
+		std::cout << "\nQ:";
+	} else if (tag.tagName() == "li" && m_wordTag) {
+		if (m_liTag) {
+			std::cout << "line: " << __LINE__ << std::endl;
+			throw std::exception();
+		}
+		m_liTag = true;
+		std::cout << "\nA:";
+	} else if (m_h4Tag || m_liTag) {
+		std::cout << "<" << tag.tagName() << ">";
+	}
+}
+
+void TagStack::popProcess(Element tag)
+{
+	if (tag.attr("id") == "collinsResult") {
+		if (!m_wordTag) {
+			std::cout << "line: " << __LINE__ << std::endl;
+			throw std::exception();
+		}
+		m_wordTag = false;
+		std::cout << "\n";
+	} else if (tag.tagName() == "h4" && m_wordTag) {
+		if (!m_h4Tag) {
+			std::cout << "line: " << __LINE__ << std::endl;
+			throw std::exception();
+		}
+		m_h4Tag = false;
+		std::cout << "\n";
+	} else if (tag.tagName() == "li" && m_wordTag) {
+		if (!m_liTag) {
+			std::cout << "line: " << __LINE__ << std::endl;
+			throw std::exception();
+		}
+		m_liTag = false;
+		std::cout << "\n";
+	} else if (m_h4Tag || m_liTag) {
+		std::cout << "</" << tag.tagName() << ">";
+	}
+
+}
+
+void TagStack::add(Element tag)
+{
+	if (tag.type() == Element::TAG && !Element::isInFilter(tag)) {
+		if (tag.tagType() == Element::OPENING_TAG) {
+			m_stack.push_back(tag);
+			pushProcess(tag);
+		} else if (tag.tagName() == m_stack.back().tagName()) {
+			popProcess(m_stack.back());
+			m_stack.pop_back();
+		} else {
+			std::cout << tag.tagName() << ";" << m_stack.back().tagName() << std::endl;
+			std::cout << "line: " << __LINE__ << std::endl;
+			throw std::exception();
+		}
+	} else if (tag.type() == Element::TEXT) {
+		if (m_h4Tag || m_liTag) {
+			std::cout << trim(tag.string());
+		}
+	}
+}
+
 int main (int argc, char const* argv[]) {
 	std::ifstream wordFile(argv[1]);
 	FileBuffer fileBuffer(wordFile);
+	TagStack stack;
 	while (!fileBuffer.eof()) {
 		Element element(fileBuffer.nextElement());
-		if (element.type() == Element::TAG) {
-			std::cout << element.string() << std::endl;
-			element.showAttrs();
-		}
+		//if (element.type() == Element::TAG) {
+			//std::cout << element.string() << std::endl;
+			//element.showAttrs();
+			stack.add(element);
+		//}
 	}
+
+	//std::cout << "depth of stack is " << stack.getDepth() << std::endl;
 	return 0;
 }
 
