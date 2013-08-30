@@ -4,21 +4,26 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include "convert.h"
 
-class Tag
+
+
+FileBuffer::FileBuffer(std::ifstream & file) : m_bufLen(0),
+	m_curInBuf(m_buf),
+	m_file(file),
+	m_isLastElementTag(false)
 {
-	public:
-		Tag(const std::string & tagStr) : m_tagStr(trim(tagStr)) {}
-		std::string string() {return m_tagStr;}
+	m_buf[0] = 0;
+}
 
-	private:
-		std::string trim(const std::string & tagStr);
-	private:
-		std::string m_tagStr;
+FileBuffer::~FileBuffer()
+{
+	if(m_file) {
+		m_file.close();
+	}
+}
 
-};
-
-std::string Tag::trim(const std::string & tagStr)
+std::string FileBuffer::trim(const std::string & tagStr)
 {
 	char lastCh = '\0';
 	std::string str(tagStr);
@@ -28,47 +33,23 @@ std::string Tag::trim(const std::string & tagStr)
 				lastCh = ch;
 				return result;
 				}), str.end());
+	if (isspace(str.back())) {
+		str.pop_back();
+	}
 	return str;
 }
 
-class FileBuffer
-{
-	public:
-		FileBuffer(std::ifstream & file)
-			: m_bufLen(0),
-			m_curInBuf(m_buf),
-			m_file(file),
-			m_isLastElementTag(false)
-		{
-			m_buf[0] = 0;
-		}
-
-		~FileBuffer()
-		{
-			if(m_file) {
-				m_file.close();
-			}
-		}
-
-		std::string nextElement();
-		std::string outputBuf();
-	private:
-		char * findTagHead();
-		char * findTagEnd();
-		std::string findTag();
-		bool readMore();
-	private:
-		static const size_t MAX_BUF_LEN = 4 * 1024;
-		char m_buf[MAX_BUF_LEN + 1];
-		size_t m_bufLen;
-		char * m_curInBuf;
-		std::ifstream & m_file;
-
-		bool m_isLastElementTag;
-		std::string m_curTag;
-};
-
 char* FileBuffer::findTagHead()
+{
+	char * pos = strchr(m_curInBuf, '<');
+	if (pos) {
+		m_curInBuf = pos;
+	}
+	return pos;
+}
+
+
+char* FileBuffer::getTagHead()
 {
 	char * pos = strchr(m_curInBuf, '<');
 	if (pos) {
@@ -77,7 +58,7 @@ char* FileBuffer::findTagHead()
 	return pos;
 }
 
-char * FileBuffer::findTagEnd()
+char * FileBuffer::getTagEnd()
 {
 	char * pos = strchr(m_curInBuf, '>');
 	if (pos) {
@@ -86,17 +67,17 @@ char * FileBuffer::findTagEnd()
 	return pos;
 }
 
-std::string FileBuffer::findTag()
+std::string FileBuffer::getTag()
 {
 	std::string tag;
 
-	char * tagHead = findTagHead();
+	char * tagHead = getTagHead();
 	while(!tagHead && readMore()) {
-		tagHead = findTagHead();
+		tagHead = getTagHead();
 	}
 
 	if (tagHead) {
-		char * tagEnd = findTagEnd();
+		char * tagEnd = getTagEnd();
 		if (tagEnd) {
 			tag.append(tagHead, tagEnd + 1 - tagHead);
 			return tag;
@@ -104,7 +85,7 @@ std::string FileBuffer::findTag()
 			tag.append(tagHead);
 		}
 
-		while(readMore() && !(tagEnd = findTagEnd())) {
+		while(readMore() && !(tagEnd = getTagEnd())) {
 			tag.append(m_buf);
 		}
 		if (tagEnd) {
@@ -113,6 +94,30 @@ std::string FileBuffer::findTag()
 	}
 
 	return tag;
+}
+
+std::string FileBuffer::getText()
+{
+	std::string text;
+
+	char * curPos = m_curInBuf;
+	char * tagHead = findTagHead();
+	if (tagHead) {
+		text.append(curPos, tagHead - curPos);
+		return text;
+	} else {
+		text.append(curPos);
+	}
+
+	while(readMore() && !(tagHead = findTagHead())) {
+		text.append(m_buf);
+	}
+	if (tagHead) {
+		text.append(m_buf, tagHead - m_buf);
+	}
+
+	return text;
+
 }
 
 bool FileBuffer::readMore()
@@ -131,33 +136,44 @@ bool FileBuffer::readMore()
 		m_curInBuf = m_buf;
 		return true;
 	}
+	m_curInBuf = m_buf + m_bufLen;
 	std::cout << "at the end of file or something wrong" << std::endl;
 	return false;
 }
 
-std::string FileBuffer::nextElement()
-{
-	std::string tag(findTag());
-	while(!tag.empty()) {
-		std::cout << Tag(tag).string() << std::endl;
-		tag = findTag();
-	}
 
-	std::cout << std::endl;
-	return "";
+Element FileBuffer::nextElement()
+{
+	std::string element;
+
+	if (m_isLastElementTag) {
+		element =  trim(getText());
+		if (!element.empty()) {
+			m_isLastElementTag = false;
+			return Element(element, Element::TEXT);
+		}
+	}
+	element =  trim(getTag());
+	m_isLastElementTag = true;
+	return Element(element, Element::TAG);
+
+	//return Element(trim(getTag()), Element::TAG);
 }
 
-std::string FileBuffer::outputBuf()
+bool FileBuffer::eof()
 {
-	return m_buf;
+	return !m_file && (m_curInBuf == (m_buf + m_bufLen));
 }
 
 int main (int argc, char const* argv[]) {
 	std::ifstream wordFile(argv[1]);
 	FileBuffer fileBuffer(wordFile);
-	fileBuffer.nextElement();
-	//while (fileBuffer.readMore()){
-		//std::cout << fileBuffer.outputBuf() << std::endl;
-	//}
+	while (!fileBuffer.eof()) {
+		Element element(fileBuffer.nextElement());
+		if (element.type() == Element::TAG) {
+			std::cout << element.string() << std::endl;
+		}
+	}
 	return 0;
 }
+
