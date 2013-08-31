@@ -28,6 +28,13 @@ namespace {
 		return str;
 	}
 
+    std::string filterChinese(const std::string & text) {
+        std::string str(text);
+		str.erase(std::remove_if(str.begin(), str.end(), [](char ch){
+                    return 0 < ch && ch < 128;
+					}), str.end());
+        return str;
+    }
 }
 
 
@@ -249,15 +256,15 @@ void TagStack::pushProcess(Element tag)
 		}
 		m_h4Tag = true;
 		std::cout << "\nQ:";
-	} else if (tag.tagName() == "li" && m_wordTag) {
+	} else if (tag.attr("class") == "collinsMajorTrans" && m_wordTag) {
 		if (m_liTag) {
 			std::cout << "line: " << __LINE__ << std::endl;
 			throw std::exception();
 		}
 		m_liTag = true;
 		std::cout << "\nA:";
-	} else if (m_h4Tag || m_liTag) {
-		std::cout << "<" << tag.tagName() << ">";
+	} else if (m_h4Tag) {
+		std::cout << " <" << tag.tagName() << ">";
 	}
 }
 
@@ -277,15 +284,15 @@ void TagStack::popProcess(Element tag)
 		}
 		m_h4Tag = false;
 		std::cout << "\n";
-	} else if (tag.tagName() == "li" && m_wordTag) {
+	} else if (tag.attr("class") == "collinsMajorTrans" && m_wordTag) {
 		if (!m_liTag) {
 			std::cout << "line: " << __LINE__ << std::endl;
 			throw std::exception();
 		}
 		m_liTag = false;
 		std::cout << "\n";
-	} else if (m_h4Tag || m_liTag) {
-		std::cout << "</" << tag.tagName() << ">";
+	} else if (m_h4Tag) {
+		std::cout << "</" << tag.tagName() << "> ";
 	}
 
 }
@@ -306,7 +313,7 @@ void TagStack::add(Element tag)
 		}
 	} else if (tag.type() == Element::TEXT) {
 		if (m_h4Tag || m_liTag) {
-			std::cout << trim(tag.string());
+			std::cout << filterChinese(trim(tag.string()));
 		}
 	}
 }
