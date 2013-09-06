@@ -29,11 +29,10 @@ namespace {
 	}
 
     std::string filterChinese(const std::string & text) {
-        std::string str(text);
-		str.erase(std::remove_if(str.begin(), str.end(), [](char ch){
-                    return 0 < ch && ch < 128;
-					}), str.end());
-        return str;
+        auto it = std::find_if(text.begin(), text.end(), [](char ch) {
+                    return  ch < 0;
+                });
+        return it != text.end() ? std::string(it, text.end()) : std::string();
     }
 }
 
@@ -283,14 +282,12 @@ void TagStack::popProcess(Element tag)
 			throw std::exception();
 		}
 		m_h4Tag = false;
-		std::cout << "\n";
 	} else if (tag.attr("class") == "collinsMajorTrans" && m_wordTag) {
 		if (!m_liTag) {
 			std::cout << "line: " << __LINE__ << std::endl;
 			throw std::exception();
 		}
 		m_liTag = false;
-		std::cout << "\n";
 	} else if (m_h4Tag) {
 		std::cout << "</" << tag.tagName() << "> ";
 	}
@@ -312,9 +309,11 @@ void TagStack::add(Element tag)
 			throw std::exception();
 		}
 	} else if (tag.type() == Element::TEXT) {
-		if (m_h4Tag || m_liTag) {
+		if (m_h4Tag) {
+			std::cout << trim(tag.string());
+		} else if (m_liTag) {
 			std::cout << filterChinese(trim(tag.string()));
-		}
+        }
 	}
 }
 
@@ -323,15 +322,10 @@ int main (int argc, char const* argv[]) {
 	FileBuffer fileBuffer(wordFile);
 	TagStack stack;
 	while (!fileBuffer.eof()) {
-		Element element(fileBuffer.nextElement());
-		//if (element.type() == Element::TAG) {
-			//std::cout << element.string() << std::endl;
-			//element.showAttrs();
-			stack.add(element);
-		//}
+        Element element(fileBuffer.nextElement());
+        stack.add(element);
 	}
 
-	//std::cout << "depth of stack is " << stack.getDepth() << std::endl;
 	return 0;
 }
 
