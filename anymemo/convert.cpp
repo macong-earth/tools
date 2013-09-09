@@ -242,7 +242,9 @@ bool FileBuffer::eof()
 
 void TagStack::pushProcess(Element tag)
 {
-	if (tag.attr("id") == "collinsResult") {
+	if (tag.attr("id").find("word-") == 0) {
+		std::cout << "\nQ: " << tag.attr("id").substr(5);
+	} else if (tag.attr("id") == "collinsResult") {
 		if (m_wordTag) {
 			std::cout << "line: " << __LINE__ << std::endl;
 			throw std::exception();
@@ -254,7 +256,7 @@ void TagStack::pushProcess(Element tag)
 			throw std::exception();
 		}
 		m_h4Tag = true;
-		std::cout << "\nQ:";
+		std::cout << "\nA:";
 	} else if (tag.attr("class") == "collinsMajorTrans" && m_wordTag) {
 		if (m_liTag) {
 			std::cout << "line: " << __LINE__ << std::endl;

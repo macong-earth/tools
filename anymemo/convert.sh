@@ -2,6 +2,8 @@
 
 for file in `ls html`
 do
-    echo "./AnymemoConvert html/$file > txt/`basename $file`.txt"
-    ./AnymemoConvert html/$file > txt/`basename $file`.txt
+	_file=`basename $file`
+	_file=${_file:0:3}
+    echo "./AnymemoConvert html/$file > txt/$_file.txt"
+    ./AnymemoConvert html/$file > txt/$_file.txt
 done
