@@ -1,7 +1,14 @@
-filename = raw_input("Enter your input:");
-print "Received input is : " , str
+#! /usr/bin/python
+#filename = raw_input("Enter your input:")
+#print "Received input is : ", str
 
-f = open(filename, 'r')
+import sys
+
+if len(sys.argv) != 2:
+    print "Usage: python lemmatizer.py filename"
+    sys.exit(1)
+
+f = open(sys.argv[1], 'r')
 all_words = map(lambda l: l.split(" "), f.readlines())
 
 from nltk.stem import WordNetLemmatizer
