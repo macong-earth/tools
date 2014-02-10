@@ -1,7 +1,3 @@
-#! /usr/bin/python
-#filename = raw_input("Enter your input:")
-#print "Received input is : ", str
-
 import sys
 
 if len(sys.argv) != 2:
