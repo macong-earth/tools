@@ -1,5 +1,17 @@
 #! /bin/bash
 
+if [ "$1" == "" ]
+then
+echo "Usage: filter input"
+exit
+fi
+
 python ./scripts/lemmatizer.py $(pwd)/$1 | tr '[:upper:]' '[:lower:]' | sort -u > uni
-./bin/mygrep.exe wordlist.txt uni > newwords.txt 
-#rm uni 
+
+echo "" > result.txt
+for (( i = 1 ; i < 10 ; i++ ))
+do
+echo "< $i >" >> result.txt
+./bin/mygrep.exe wordlists/$i.txt uni >> result.txt 
+done
+rm uni 
