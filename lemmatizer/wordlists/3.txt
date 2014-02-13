@@ -1,3 +1,4 @@
+
 abroad
 absence
 absent
@@ -348,7 +349,7 @@ germany
 glide
 glitter
 globe
-good
+good-bye
 goodly
 goodness
 goods
@@ -399,7 +400,7 @@ humor
 hunger
 hush
 hut
-ice
+ice-cream
 ignorant
 image
 imagination
@@ -464,7 +465,7 @@ lily
 link
 liquid
 lively
-living
+living-room
 local
 locate
 lofty

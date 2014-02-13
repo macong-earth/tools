@@ -1,3 +1,4 @@
+
 abbot
 abject
 abrupt
@@ -340,7 +341,7 @@ fin
 finance
 fireman
 fireside
-first
+first-born
 fixture
 flaw
 fleecy
@@ -505,7 +506,7 @@ loathsome
 locality
 logic
 longitude
-loud
+loud-speaker
 luminous
 luxurious
 magnet
@@ -843,7 +844,7 @@ tenement
 terminate
 testament
 theft
-then
+then)
 therewith
 thirteenth
 thrall

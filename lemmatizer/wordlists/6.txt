@@ -1,3 +1,4 @@
+
 abacus
 abate
 abbey
@@ -246,7 +247,7 @@ dunce
 dusk
 dusky
 dwindle
-e
+e.g.
 eastward
 eaves
 ebb
@@ -301,7 +302,7 @@ faithless
 falcon
 falter
 fantastic
-far
+far-off
 fashionable
 fathom
 fatigue
@@ -370,7 +371,7 @@ gravy
 grocery
 groove
 grope
-grown
+grown-up
 guinea
 gunpowder
 gym

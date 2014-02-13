@@ -1,3 +1,4 @@
+
 abdomen
 abdominal
 abnormal
@@ -129,7 +130,9 @@ clink
 cloister
 cloy
 clump
-co
+co-operate
+co-operative
+co-ordinate
 cob
 coffeepot
 coffer
@@ -183,7 +186,7 @@ coy
 craven
 creamy
 crook
-cross
+cross-eyed
 crucify
 cubit
 curd
@@ -385,7 +388,7 @@ guidance
 guild
 gull
 gymnastics
-half
+half-hearted
 harmful
 haze
 headland
@@ -522,7 +525,7 @@ melodious
 merge
 mermaid
 merriment
-metric
+metric-system
 migration
 milkmaid
 mimic
@@ -562,7 +565,7 @@ obscene
 obstruction
 offset
 oily
-old
+old-fashioned
 onset
 ooze
 opaque
@@ -835,7 +838,7 @@ toleration
 tonic
 toothpick
 topmost
-topsy
+topsy-turvy
 tractor
 transaction
 transgression

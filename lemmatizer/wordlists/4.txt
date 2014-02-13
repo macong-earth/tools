@@ -1,3 +1,4 @@
+
 abandon
 abhor
 abide
@@ -214,7 +215,7 @@ entry
 envelope
 errand
 estimate
-etc
+etc.
 european
 eventually
 everlasting

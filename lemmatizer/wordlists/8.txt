@@ -1,3 +1,4 @@
+
 abolition
 abstract
 academic
@@ -147,7 +148,7 @@ cleaner
 clergy
 climax
 clumsy
-co
+co-operation
 coax
 cobweb
 code
@@ -385,7 +386,7 @@ gilt
 gipsy
 gloss
 glossy
-gold
+gold-smith
 golf
 grab
 graft
@@ -781,7 +782,7 @@ signet
 significant
 simile
 siren
-sitting
+sitting-room
 sixpence
 sixteenth
 slash
