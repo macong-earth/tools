@@ -6,7 +6,7 @@ echo "Usage: filter input"
 exit
 fi
 
-python ./scripts/lemmatizer.py $(pwd)/$1 | tr '[:upper:]' '[:lower:]' | sort -u > uni
+python ./scripts/lemmatizer.py "$(pwd)/$1" | tr '[:upper:]' '[:lower:]' | sort -u > uni
 
 cat ./scripts/header.template > result.html
 
@@ -17,4 +17,4 @@ echo "[ $i ]<br>" >> result.html
 done
 
 cat ./scripts/tail.template >> result.html
-rm uni 
+#rm uni 
