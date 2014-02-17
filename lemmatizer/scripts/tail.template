@@ -1,0 +1,11 @@
+<script>
+	var speaker = new Audio();
+	function pronounce(word) {
+		speaker.src = "https://www.gstatic.com/dictionary/static/sounds/de/0/" + word + ".mp3";
+		speaker.play();
+}
+</script>
+</body>
+</html>
+
+
