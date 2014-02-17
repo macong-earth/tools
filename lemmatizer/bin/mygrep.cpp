@@ -30,9 +30,9 @@ int main(int argc, char * argv[])
 			if (words.find(word) != words.end()) {
 				auto it = dictionary.find(word);
 				if ( it != dictionary.end()) {
-					std::cout << it->second << std::endl;
+					std::cout << "<a onclick=\"pronounce('" << it->first << "')\">" << it->second << "</a><br>" << std::endl;
 				} else {
-					std::cout << word << std::endl;
+					std::cout << word << "<br>" << std::endl;
 				}
 			}
 			word.clear();
