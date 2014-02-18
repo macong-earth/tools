@@ -8,39 +8,36 @@
 
 int main(int argc, char * argv[])
 {
-	if (argc >= 3) {
-		std::ifstream wordlistIs(argv[1]);
-		std::istream_iterator<std::string> start(wordlistIs), end;
-		std::set<std::string> words(start, end);
+    if (argc >= 3) {
+        char * sourceFileName = NULL;
+        char * filterFileName = NULL;
+        bool isInvert         = false;
 
-		std::ifstream dictionaryIs("dictionary/oxford.txt");
-		std::map<std::string, std::string> dictionary;
-		std::string line;
-		size_t splitPos = 0;
-		while(std::getline(dictionaryIs, line)) {
-			if ((splitPos = line.find('\t')) != std::string::npos) {
-				dictionary.insert(std::make_pair( line.substr(0, splitPos), line));
-			}
-		}
+        if (strcmp("-v", argv[1]) == 0) {
+            sourceFileName = argv[2];
+            filterFileName = argv[3];
+            isInvert = true;
+        } else {
+            sourceFileName = argv[1];
+            filterFileName = argv[2];
+        }
 
-		std::ifstream articalIs(argv[2]);
-		std::string word;
-		while(articalIs) {
-			articalIs >> word;
-			if (words.find(word) != words.end()) {
-				auto it = dictionary.find(word);
-				if ( it != dictionary.end()) {
-					std::cout << "<a onclick=\"pronounce('" << it->first << "')\">" << it->second << "</a><br>" << std::endl;
-				} else {
-					std::cout << word << "<br>" << std::endl;
-				}
-			}
-			word.clear();
-		}
+        std::ifstream wordlistIs(sourceFileName);
+        std::istream_iterator<std::string> start(wordlistIs), end;
+        std::set<std::string> words(start, end);
 
-		std::cout << std::endl;
-	}
-	return 0;
+        std::ifstream articalIs(filterFileName);
+        std::string word;
+        while(articalIs >> word) {
+            if ((words.find(word) != words.end()) != isInvert) {
+                    std::cout << word << std::endl;
+            }
+        }
+
+        std::cout << std::endl;
+        return 0;
+    }
+    return -1;
 
 }
 
