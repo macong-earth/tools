@@ -4,6 +4,18 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=GBK">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
  	<title>WORDS</title>
+	<style>
+		body {
+			background-color: #DDD;
+		}
+		div {
+			border: 1px solid rgb(135, 83, 170);
+			background-color: rgb(217, 185, 153);
+			padding: 4px;
+			border-radius: 6px;
+			margin: 1px;
+		}
+	</style>
 </head>
 <body>
 

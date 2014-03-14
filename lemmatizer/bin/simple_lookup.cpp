@@ -21,18 +21,14 @@ int main(int argc, const char *argv[])
 
         std::ifstream wordlistIs(argv[1]);
         std::string word;
-        while (wordlistIs >> word) {
-            if ('#' != word[0]) {
-                auto it = dictionary.find(word);
-                if ( it != dictionary.end()) {
-                    std::cout << "<a onclick=\"pronounce('" << it->first << "')\"><div>" << it->second << "</div></a>" << std::endl;
-                } else {
-                    std::cout << word << "<br>" << std::endl;
-                }
-            } else {
-                std::cout << word << "<br>" << std::endl;
-            }
-        }
+	while (wordlistIs >> word) {
+		auto it = dictionary.find(word);
+		if ( it != dictionary.end()) {
+			std::cout << it->second << std::endl;
+		} else {
+			std::cout << word << std::endl;
+		}
+	}
 
         return 0;
     }
