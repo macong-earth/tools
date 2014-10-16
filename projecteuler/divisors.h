@@ -1,9 +1,18 @@
+#include <iostream>
+#include <vector>
 #include <string>
 #include <cmath>
 #include <algorithm>
-#include "print.h"
 
 namespace Euler {
+    template<typename T>
+    std::ostream& operator << (std::ostream & os, const std::vector<T> v) {
+        for(auto it = v.begin(), endit = v.end(); it != endit; ++it) {
+            os << *it << ",";
+        }
+        return os;
+    }
+
     template<typename T>
     std::vector<T> GetDivisors(T value)
     {
@@ -30,4 +39,18 @@ namespace Euler {
 
         return divisors;
     }
+
+    template<typename T>
+        std::vector<T> PrimeFactorization(T value)
+        {
+            std::vector<T> factors;
+
+            T factor = 2;
+            while (value > 1) {
+                while (value % factor != 0) factor++;
+                factors.push_back(factor);
+                value /= factor;
+            }
+            return factors;
+        }
 } // namespace Euler
